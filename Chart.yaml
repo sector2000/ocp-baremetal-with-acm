@@ -1,0 +1,4 @@
+apiVersion: v2
+description: Managed Cluster Installation via ACM
+name: managed-cluster
+version: 1.0.0

@@ -1,0 +1,30 @@
+apiVersion: agent-install.openshift.io/v1beta1
+kind: InfraEnv
+metadata:
+  labels:
+    agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.location }}
+    networkType: static
+  name: {{ .Values.cluster_name }}
+  namespace: {{ .Values.cluster_name }}
+spec:
+  clusterRef:
+    name: {{ .Values.cluster_name }}
+    namespace: {{ .Values.cluster_name }}
+  additionalNTPSources:
+  {{- range .Values.network.ntp_sources }}
+  - {{ . }}
+  {{- end }}
+  agentLabels:
+    agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.location }}
+  cpuArchitecture: x86_64
+  ipxeScriptType: DiscoveryImageAlways
+  nmStateConfigLabelSelector:
+    matchLabels:
+      infraenvs.agent-install.openshift.io: {{ .Values.cluster_name }}
+  proxy:
+    httpProxy: {{ .Values.network.proxy }}
+    httpsProxy: {{ .Values.network.proxy }}
+    noProxy: {{ join "," (keys .Values.network.no_proxy_entries) }}
+  pullSecretRef:
+    name: pullsecret-{{ .Values.cluster_name }}
+  sshAuthorizedKey: {{ .Values.ssh_public_key }}

@@ -1,0 +1,79 @@
+cluster_name: cluster1
+cluster_set: clusterset1
+location: <LOCATION>
+network:
+  api_vip: <API VIP>
+  ingress_vip: <INGRESS VIP>
+openshift_version: <OCP VERSION>
+bmc:
+  username: <BMC USER>
+  password: <BMC PASSWORD>
+hosts:
+  - name: <NAME MASTER1>
+    role: master
+    is_storage: true
+    bmc_server: <BMC SERVER MASTER1>
+    network:
+      gateway: <NETWORK GATEWAY MASTER1>
+      ip: <IP MASTER1>
+      prefix_length: <NETWORK PREFIX LENGTH MASTER1>
+      aggregated_interfaces:
+        - name: <IF1 NAME MASTER1>
+          mac_address: <IF1 MAC MASTER1>
+          is_boot: true
+        - name: <IF2 NAME MASTER1>
+          mac_address: <IF1 MAC MASTER1>
+  - name: <NAME MASTER2>
+    role: master
+    is_storage: true
+    bmc_server: <BMC SERVER MASTER2>
+    network:
+      gateway: <NETWORK GATEWAY MASTER2>
+      ip: <IP MASTER2>
+      prefix_length: <NETWORK PREFIX LENGTH MASTER2>
+      aggregated_interfaces:
+        - name: <IF1 NAME MASTER2>
+          mac_address: <IF1 MAC MASTER2>
+          is_boot: true
+        - name: <IF2 NAME MASTER2>
+          mac_address: <IF1 MAC MASTER2>
+  - name: <NAME MASTER3>
+    role: master
+    is_storage: true
+    bmc_server: <BMC SERVER MASTER3>
+    network:
+      gateway: <NETWORK GATEWAY MASTER3>
+      ip: <IP MASTER3>
+      prefix_length: <NETWORK PREFIX LENGTH MASTER3>
+      aggregated_interfaces:
+        - name: <IF1 NAME MASTER3>
+          mac_address: <IF1 MAC MASTER3>
+          is_boot: true
+        - name: <IF2 NAME MASTER3>
+          mac_address: <IF1 MAC MASTER3>
+  - name: <NAME WORKER1>
+    role: worker
+    bmc_server: <BMC SERVER WORKER1>
+    network:
+      gateway: <NETWORK GATEWAY WORKER1>
+      ip: <IP WORKER1>
+      prefix_length: <NETWORK PREFIX LENGTH WORKER1>
+      aggregated_interfaces:
+        - name: <IF1 NAME WORKER1>
+          mac_address: <IF1 MAC WORKER1>
+          is_boot: true
+        - name: <IF2 NAME WORKER1>
+          mac_address: <IF1 MAC WORKER1>
+  - name: <NAME WORKER2>
+    role: worker
+    bmc_server: <BMC SERVER WORKER2>
+    network:
+      gateway: <NETWORK GATEWAY WORKER2>
+      ip: <IP WORKER2>
+      prefix_length: <NETWORK PREFIX LENGTH WORKER2>
+      aggregated_interfaces:
+        - name: <IF1 NAME WORKER2>
+          mac_address: <IF1 MAC WORKER2>
+          is_boot: true
+        - name: <IF2 NAME WORKER2>
+          mac_address: <IF1 MAC WORKER2>

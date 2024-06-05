@@ -1,0 +1,102 @@
+{{- range .Values.hosts }}
+apiVersion: agent-install.openshift.io/v1beta1
+kind: NMStateConfig
+metadata:
+  labels:
+    agent-install.openshift.io/bmh: {{ .name }}
+    infraenvs.agent-install.openshift.io: {{ $.Values.cluster_name }}
+  name: {{ .name }}
+  namespace: {{ $.Values.cluster_name }}
+spec:
+  config:
+    dns-resolver:
+      config:
+        search:
+        - search {{ $.Values.network.dns.search }}
+        server:
+        {{- range $.Values.network.dns.servers }}
+        - {{ . }}
+        {{- end }}
+    interfaces:
+    - link-aggregation:
+        mode: 802.3ad
+        options:
+          lacp_rate: 'fast'
+        port:
+        {{- range .network.aggregated_interfaces }}
+        - {{ .name }}
+        {{- end }}
+      mtu: 9000
+      name: bond0
+      state: up
+      type: bond
+    {{- if $.Values.network.vlan_id }}
+    - name: bond0.{{ $.Values.network.vlan_id }}
+      state: up
+      type: vlan
+      mtu: 9000
+      vlan:
+        base-iface: bond0
+        id: {{ $.Values.network.vlan_id }}
+    {{- end }}  
+      ipv4:
+        address:
+        - ip: {{ .network.ip }}
+          prefix-length: {{ .network.prefix_length }}
+        dhcp: false
+        enabled: true
+    routes:
+      config:
+      - destination: 0.0.0.0/0
+        next-hop-address: {{ .network.gateway }}
+        next-hop-interface: bond0{{- if $.Values.network.vlan_id }}.{{ $.Values.network.vlan_id }}{{- end }}
+  interfaces:
+  {{- range .network.aggregated_interfaces }}
+  - macAddress: {{ .mac_address }}
+    name: {{ .name }}
+  {{- end }}
+---
+{{- if .bmc_server }}
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    environment.metal3.io: baremetal
+  name: bmc-credentials-{{ .name }}
+  namespace: {{ $.Values.cluster_name }}
+data:
+  username: {{ $.Values.bmc.username | b64enc }}
+  password: {{ $.Values.bmc.password | b64enc }}
+type: Opaque
+{{- end }}
+---
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  annotations:
+    bmac.agent-install.openshift.io/hostname: {{ .name }}.{{ $.Values.base_domain }}
+    bmac.agent-install.openshift.io/role: {{ .role }}
+    {{- if .is_storage }}
+    bmac.agent-install.openshift.io.node-label.cluster.ocs.openshift.io/openshift-storage: ''
+    {{- end }}
+    inspect.metal3.io: disabled
+  labels:
+    infraenvs.agent-install.openshift.io: {{ $.Values.cluster_name }}
+  name: {{ .name }}
+  namespace: {{ $.Values.cluster_name }}
+spec:
+  rootDeviceHints:
+    rotational: true
+  automatedCleaningMode: disabled
+  {{- if .bmc_server }}
+  bmc:
+    address: idrac-virtualmedia://{{ .bmc_server }}/redfish/v1/Systems/System.Embedded.1
+    credentialsName: bmc-credentials-{{ .name }}
+    disableCertificateVerification: true
+  {{- end }}
+  bootMACAddress: {{ range .network.aggregated_interfaces }}{{ if .is_boot }}{{ .mac_address }}{{ end }}{{ end }}
+  customDeploy:
+    method: start_assisted_install
+  online: true
+---
+{{- end }}

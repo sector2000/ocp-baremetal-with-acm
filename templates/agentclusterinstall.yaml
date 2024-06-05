@@ -1,0 +1,34 @@
+{{- $count_workers := 0 }}
+{{- range .Values.hosts }}
+{{- if eq .role "worker" }}
+  {{- $count_workers = add1 $count_workers }}
+{{- end }}
+{{- end }}
+apiVersion: extensions.hive.openshift.io/v1beta1
+kind: AgentClusterInstall
+metadata:
+  name: {{ .Values.cluster_name }}
+  namespace: {{ .Values.cluster_name }}
+spec:
+  apiVIP: {{ .Values.network.api_vip }}
+  clusterDeploymentRef:
+    name: {{ .Values.cluster_name }}
+  imageSetRef:
+    name: openshift-v{{ .Values.openshift_version }}
+  ingressVIP: {{ .Values.network.ingress_vip }}
+  networking:
+    clusterNetwork:
+    - cidr: 10.128.0.0/14
+      hostPrefix: 23
+    networkType: OVNKubernetes
+    serviceNetwork:
+    - 172.30.0.0/16
+    userManagedNetworking: false
+  provisionRequirements:
+    controlPlaneAgents: 3
+    workerAgents: {{ $count_workers }}
+  proxy:
+    httpProxy: {{ .Values.network.proxy }}
+    httpsProxy: {{ .Values.network.proxy }}
+    noProxy: {{ join "," (keys .Values.network.no_proxy_entries) }}
+  sshPublicKey: {{ .Values.ssh_public_key }}

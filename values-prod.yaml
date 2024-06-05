@@ -1,0 +1,15 @@
+ssh_public_key: |
+  <SSH_PUBLIC_KEY>
+
+network:
+  dns:
+    search: <DNS SEARCH DOMAIN>
+    servers:
+    - <DNS SERVER 1>
+    - <DNS SERVER 2>
+  ntp_sources:
+  - <NTP SOURCE 1>
+  - <NTP SOURCE 2>
+  - <NTP SOURCE 3>
+
+base_domain: <BASE DOMAIN>

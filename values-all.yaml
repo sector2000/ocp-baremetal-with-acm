@@ -1,0 +1,9 @@
+pull_secret: |
+  <PULL SECRET>
+network:
+  proxy: http(s)://<proxy_host>:<proxy_port>
+  no_proxy_entries:
+    '.damain1':
+    '.domain2':
+    'cidr1':
+    'cidr2':
